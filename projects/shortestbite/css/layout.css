@@ -1,0 +1,220 @@
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+#topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: nowrap;
+  padding: 9px 16px;
+  background: linear-gradient(180deg, #161d27 0%, var(--surface) 100%);
+  border-bottom: 1px solid var(--border);
+  flex: 0 0 auto;
+  z-index: 20;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.brand-mark {
+  font-size: 18px;
+  filter: drop-shadow(0 2px 4px rgba(227, 77, 58, 0.4));
+}
+
+.topbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+}
+
+.topbar-divider {
+  width: 1px;
+  flex: 0 0 1px;
+  height: 22px;
+  background: var(--border);
+}
+
+.speed-group {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.speed-group .speed-btn {
+  border: none;
+  background: transparent;
+  padding: 3px 9px;
+  min-width: 30px;
+  min-height: 24px;
+  font-size: 12px;
+  border-radius: 5px;
+}
+
+.speed-group .speed-btn.active {
+  background: var(--brand);
+  color: #fff;
+}
+
+.clock-cluster {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 92px;
+  flex: 0 0 auto;
+}
+
+.clock {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+#main {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+}
+
+#map-container {
+  position: relative;
+  flex: 1 1 auto;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--bg);
+}
+
+/* The renderer owns this element exclusively and may clear it wholesale when
+   swapping between the Canvas and Leaflet views, so the floating map UI has to
+   live outside it. */
+#map-surface {
+  position: absolute;
+  inset: 0;
+}
+
+/* Floating map UI. The wrapper never swallows pointer events — only the
+   individual cards inside it do. */
+#map-ui {
+  position: absolute;
+  inset: 0;
+  z-index: 500;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  gap: 10px;
+}
+
+#algo-panel {
+  width: 320px;
+  flex: 0 0 320px;
+  position: relative; /* contains .visually-hidden children so they can't stretch the document */
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 14px 24px;
+  scrollbar-width: thin;
+}
+
+.panel-section {
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-section:last-child {
+  border-bottom: none;
+}
+
+.panel-section h2 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-dim);
+  font-weight: 700;
+  margin: 0 0 9px;
+}
+
+.race-section { /* race-dock */
+  scroll-margin-top: 8px;
+}
+
+/* Toasts join the map's top-centre stack: under the narration strip, and under the closure banner when it shows. */
+#toast-container {
+  position: absolute;
+  top: 78px;
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 4;
+  width: max-content;
+  max-width: min(420px, calc(100% - 160px));
+  pointer-events: none;
+}
+
+#map-ui:has(#mode-banner:not([hidden])) #toast-container {
+  top: 144px;
+}
+
+@media (max-width: 1120px) {
+  #topbar {
+    gap: 10px;
+    padding-inline: 12px;
+  }
+
+  .topbar-controls {
+    gap: 6px;
+  }
+
+  .topbar-controls button {
+    padding-inline: 9px;
+  }
+
+  .field.inline {
+    gap: 2px;
+  }
+}
+
+/* Leaflet ships its own Helvetica stack; keep the map on the app typeface. */
+#map-surface.leaflet-container,
+#map-surface .leaflet-container,
+#map-surface .leaflet-control-attribution {
+  font-family: inherit;
+}
+
+#map-surface .leaflet-control-attribution {
+  padding: 4px 8px;
+  line-height: 16px;
+}
+
+#map-surface .leaflet-control-attribution a {
+  display: inline-block;
+  padding: 4px 0;
+  margin: -4px 0;
+}

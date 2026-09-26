@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShortestBite Knowledge</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/knowledge-page.css" />
+  </head>
+  <body class="knowledge-page">
+    <header class="kb-topbar">
+      <a class="brand kb-brand" href="index.html" aria-label="Open ShortestBite simulator">
+        <span class="brand-mark">🍔</span>
+        <span class="brand-name">ShortestBite</span>
+      </a>
+      <div class="kb-page-title">Knowledge</div>
+      <label class="kb-search-label">
+        <span class="visually-hidden">Search Knowledge</span>
+        <input id="kb-search" type="search" placeholder="Search articles, questions, and examples" autocomplete="off" />
+      </label>
+      <a class="kb-open-sim" href="index.html">← Open simulator</a>
+    </header>
+
+    <div class="kb-shell">
+      <aside class="kb-left" aria-label="Knowledge articles">
+        <select id="kb-topic-select" class="kb-topic-select" aria-label="Choose a Knowledge article"></select>
+        <nav id="kb-category-nav" class="kb-category-nav"></nav>
+      </aside>
+      <main id="kb-main" class="kb-main" tabindex="-1"></main>
+      <aside class="kb-right" aria-label="On this page">
+        <div class="kb-right-sticky">
+          <h2>On this page</h2>
+          <nav id="kb-on-this-page" class="kb-on-this-page"></nav>
+        </div>
+      </aside>
+    </div>
+
+    <script type="module" src="js/knowledge/page.js"></script>
+  </body>
+</html>

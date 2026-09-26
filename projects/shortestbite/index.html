@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShortestBite — watch delivery routes get solved</title>
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/missions.css" />
+  </head>
+  <body>
+    <script>
+      (function () {
+        var m = location.hash.match(/kb=([a-z0-9-]+)/);
+        if (m) location.replace('knowledge.html#' + m[1]);
+      })();
+    </script>
+    <div id="app">
+      <header id="topbar">
+        <div class="brand">
+          <span class="brand-mark">🍔</span>
+          <span class="brand-name">ShortestBite</span>
+        </div>
+
+        <div class="topbar-controls">
+          <label class="field inline" title="Switch between a generated city and a real OpenStreetMap neighbourhood">
+            City
+            <select id="city-select">
+              <option value="procedural" selected>Procedural (seed)</option>
+              <option value="koramangala">Koramangala (real streets)</option>
+            </select>
+          </label>
+          <label class="field inline" id="seed-field" title="Same seed always generates the same city">
+            Seed
+            <input id="seed-input" type="number" value="42" />
+          </label>
+          <button id="regenerate-btn" title="Generate a new city from this seed">Regenerate</button>
+
+          <div class="topbar-divider"></div>
+
+          <button id="play-pause-btn" title="Play or pause the simulated clock">⏸ Pause</button>
+          <div class="speed-group" id="speed-group" title="How fast the simulated day runs">
+            <button data-speed="1" class="speed-btn active">1x</button>
+            <button data-speed="5" class="speed-btn">5x</button>
+            <button data-speed="20" class="speed-btn">20x</button>
+            <button data-speed="60" class="speed-btn">60x</button>
+          </div>
+
+          <div class="clock-cluster" title="Time of day drives traffic and map lighting">
+            <span id="clock-display" class="clock">11:00</span>
+            <span id="traffic-regime" class="chip chip-quiet">Free flowing</span>
+          </div>
+
+          <a id="knowledge-btn" class="icon-btn" href="knowledge.html" target="_blank" rel="noopener" title="Knowledge: how every algorithm, reroute and control works (opens in a new tab)" aria-label="Open Knowledge in a new tab">📖</a>
+          <button id="help-btn" class="icon-btn" type="button" title="Missions: guided, step-by-step walkthroughs" aria-label="Open the mission hub">?</button>
+        </div>
+      </header>
+
+      <main id="main">
+        <div id="map-container">
+          <div id="map-surface"></div>
+          <div id="map-ui">
+            <div id="narration-strip" class="narration" hidden></div>
+            <div id="rider-hud" class="rider-hud" hidden></div>
+            <div id="map-legend" class="map-legend" hidden></div>
+            <div id="map-zoom" class="map-zoom" role="group" aria-label="Map zoom">
+              <button id="zoom-in-btn" type="button" title="Zoom in" aria-label="Zoom in">+</button>
+              <button id="zoom-out-btn" type="button" title="Zoom out" aria-label="Zoom out">−</button>
+              <button id="zoom-fit-btn" type="button" title="Fit the whole map" aria-label="Fit the whole map">⤢</button>
+            </div>
+            <div id="mode-banner" class="mode-banner" role="status" hidden>
+              🚧 Road-closure mode — click a road to close it (pins are paused)
+              <button id="mode-banner-done" type="button">Done</button>
+            </div>
+            <div id="toast-container" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <aside id="algo-panel">
+          <section class="panel-section">
+            <h2>1 · Plan the route</h2>
+            <p class="hint" id="pin-hint">Click a street for the <strong>pickup</strong>, then another for the <strong>drop-off</strong>.</p>
+            <ol class="pin-status" id="pin-status">
+              <li data-pin="start" class="pending"><span class="pin-dot start"></span>Pickup <em data-pin-value>not set</em></li>
+              <li data-pin="end" class="pending"><span class="pin-dot end"></span>Drop-off <em data-pin-value>not set</em></li>
+            </ol>
+          </section>
+
+          <section class="panel-section">
+            <h2>2 · Choose how to search</h2>
+            <div id="algorithm-options" class="algo-options" role="radiogroup" aria-label="Routing algorithm"></div>
+            <select id="algorithm-select" class="visually-hidden" tabindex="-1" aria-hidden="true">
+              <option value="bfs">BFS</option>
+              <option value="dijkstra" selected>Dijkstra</option>
+              <option value="astar">A*</option>
+              <option value="astar-overestimate">A* (overestimating ×2)</option>
+              <option value="bidirectional">Bidirectional Dijkstra</option>
+            </select>
+            <p id="algorithm-explanation" class="explanation"></p>
+
+            <label class="field checkbox" title="Run two algorithms on the same trip and race their riders">
+              <input type="checkbox" id="compare-toggle" autocomplete="off" />
+              Race two algorithms
+            </label>
+            <select id="compare-algorithm-select" autocomplete="off" disabled title="The challenger algorithm">
+              <option value="dijkstra">vs Dijkstra</option>
+              <option value="astar" selected>vs A*</option>
+              <option value="astar-overestimate">vs A* (overestimating ×2)</option>
+              <option value="bidirectional">vs Bidirectional Dijkstra</option>
+              <option value="bfs">vs BFS</option>
+            </select>
+          </section>
+
+          <section class="panel-section">
+            <h2>3 · Send the rider</h2>
+            <div class="button-row">
+              <button id="run-btn" class="primary" disabled title="Search for a route, then dispatch the rider">Find route</button>
+              <button id="step-btn" disabled title="Advance the search one batch at a time">Step</button>
+              <button id="reset-btn" title="Clear pins, riders and the search">Reset</button>
+            </div>
+            <label class="field checkbox" title="Keep the camera centred on the rider (dragging or zooming the map turns this off)">
+              <input type="checkbox" id="follow-toggle" autocomplete="off" />
+              Follow the rider
+            </label>
+            <p class="hint">Tip: press <strong>Step</strong> to advance one intersection at a time and see <em>why</em> it was chosen.</p>
+            <div id="node-inspector" hidden></div>
+          </section>
+
+          <section class="panel-section race-section" id="race-section" hidden>
+            <div id="race-scoreboard" class="scoreboard" hidden></div>
+          </section>
+
+          <section class="panel-section">
+            <h2>Results</h2>
+            <dl id="stats-list" class="stats">
+              <dt data-stat="status"><span data-stat-label>Status</span></dt><dd id="stat-status">Idle</dd>
+              <dt data-stat="explored"><span data-stat-label>Intersections checked</span></dt><dd id="stat-explored">—</dd>
+              <dt data-stat="heap"><span data-stat-label>Largest frontier</span></dt><dd id="stat-heap">—</dd>
+              <dt data-stat="time"><span data-stat-label>Predicted time</span></dt><dd id="stat-cost">—</dd>
+              <dt data-stat="distance"><span data-stat-label>Distance</span></dt><dd id="stat-length">—</dd>
+              <dt data-stat="segments"><span data-stat-label>Road segments</span></dt><dd id="stat-hops">—</dd>
+              <dt data-stat="compute"><span data-stat-label>Search time</span></dt><dd id="stat-time">—</dd>
+            </dl>
+            <div id="effort-chart" class="effort-chart" hidden></div>
+            <details id="directions-panel" class="directions" hidden>
+              <summary>Turn-by-turn directions</summary>
+              <ol id="directions-list"></ol>
+            </details>
+          </section>
+
+          <section class="panel-section">
+            <h2>Live map</h2>
+            <label class="field checkbox" title="Rush hour slows arterials and bridges, which changes the best route">
+              <input type="checkbox" id="traffic-toggle" checked />
+              Simulate traffic
+            </label>
+            <label class="field checkbox" title="Show a crawling pulse on congested roads">
+              <input type="checkbox" id="congestion-toggle" checked />
+              Animate congestion
+            </label>
+            <label class="field checkbox" title="Turn on, then click a road to block it for 5 sim-minutes (both directions). Riders reroute around it, or wait if there is no way round.">
+              <input type="checkbox" id="close-road-toggle" autocomplete="off" />
+              Road-closure tool
+            </label>
+            <div id="map-legend-inline"></div>
+          </section>
+
+          <section class="panel-section">
+            <details class="advanced">
+              <summary>Advanced</summary>
+              <label class="field" title="How many search steps are animated per frame — higher is faster but less readable">
+                Search steps per frame
+                <input type="range" id="steps-per-frame" min="1" max="200" value="20" />
+              </label>
+              <label class="field checkbox" title="Mark roads that can only be driven in one direction">
+                <input type="checkbox" id="one-way-toggle" />
+                Show one-way arrows
+              </label>
+            </details>
+          </section>
+        </aside>
+      </main>
+
+      <div id="result-card-root"></div>
+    </div>
+
+    <script src="vendor/leaflet/leaflet.js"></script>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

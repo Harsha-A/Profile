@@ -1,0 +1,511 @@
+.missions-root {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 850;
+  font: inherit;
+}
+
+.missions-card,
+.missions-pill,
+.missions-hub-panel {
+  pointer-events: auto;
+  color: var(--text);
+  font: inherit;
+}
+
+/* The mission card owns the bottom-left corner and reports the rider's facts itself. */
+body:has(.missions-card:not([hidden])) .rider-hud {
+  display: none;
+}
+
+.missions-card {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  width: min(360px, calc(100% - 32px));
+  /* stay below the zoom stack + narration band at the top of the map */
+  max-height: min(590px, calc(100% - 150px));
+  overflow-y: auto;
+  background: linear-gradient(180deg, rgba(26, 33, 44, 0.98), rgba(18, 23, 31, 0.98));
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  padding: 14px;
+  scrollbar-width: thin;
+}
+
+.missions-card-head,
+.missions-hub-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.missions-card h2,
+.missions-hub h2,
+.missions-outcome h3 {
+  margin: 2px 0 0;
+  font-size: 16px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.missions-kicker {
+  color: var(--brand);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.missions-icon-btn {
+  flex: 0 0 auto;
+  min-width: 32px;
+  min-height: 32px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.missions-xp-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  margin-top: 10px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(250, 204, 21, 0.1);
+  border: 1px solid rgba(250, 204, 21, 0.28);
+  color: var(--warn);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.missions-body {
+  margin-top: 12px;
+}
+
+.missions-goal,
+.missions-why,
+.missions-hub p,
+.missions-instruction,
+.missions-status {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.missions-goal {
+  margin: 0 0 12px;
+  color: var(--text);
+}
+
+.missions-prediction {
+  border: 1px solid var(--border);
+  background: rgba(11, 14, 18, 0.32);
+  border-radius: var(--radius);
+  padding: 10px;
+  margin: 0 0 12px;
+}
+
+.missions-prediction legend {
+  padding: 0 5px;
+  color: var(--muted-dim);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.missions-choice {
+  display: block;
+  width: 100%;
+  min-height: 36px;
+  margin-top: 7px;
+  text-align: left;
+  white-space: normal;
+}
+
+.missions-choice[aria-pressed='true'] {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+  color: var(--text);
+}
+
+.missions-wide {
+  width: 100%;
+  min-height: 36px;
+}
+
+.missions-step-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted-dim);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.missions-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.missions-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border-strong);
+}
+
+.missions-dots span.active {
+  background: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+.missions-dots span.done {
+  background: var(--good);
+}
+
+.missions-instruction {
+  margin: 12px 0 8px;
+  color: var(--text);
+}
+
+.missions-instruction kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  border: 1px solid var(--border-strong);
+  border-radius: 5px;
+  background: var(--surface-2);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.92em;
+}
+
+.missions-status {
+  min-height: 20px;
+  margin-bottom: 10px;
+}
+
+.missions-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.missions-actions button,
+.missions-hub button {
+  min-height: 32px;
+  font: inherit;
+}
+
+.missions-spotlight {
+  position: fixed;
+  z-index: 840;
+  border: 2px solid var(--brand);
+  border-radius: 14px;
+  box-shadow: 0 0 0 9999px rgba(5, 7, 11, 0.38), 0 0 28px rgba(227, 77, 58, 0.35);
+  pointer-events: none;
+  transition: left 0.14s var(--ease), top 0.14s var(--ease), width 0.14s var(--ease), height 0.14s var(--ease);
+}
+
+.missions-spotlight[data-map-target='true'] {
+  border-color: rgba(56, 189, 248, 0.7);
+  box-shadow: inset 0 0 0 2px rgba(56, 189, 248, 0.08), 0 0 0 9999px rgba(5, 7, 11, 0.2);
+}
+
+.missions-pill {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  min-height: 36px;
+  padding-inline: 12px;
+  border-radius: 999px;
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+.missions-facts {
+  display: grid;
+  grid-template-columns: minmax(110px, 1fr) minmax(0, 1.15fr);
+  gap: 6px 10px;
+  margin: 10px 0 12px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(11, 14, 18, 0.26);
+}
+
+.missions-facts dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.missions-facts dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.missions-prediction-result {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+}
+
+.missions-prediction-result.correct {
+  color: var(--good);
+  background: rgba(74, 222, 128, 0.1);
+}
+
+.missions-prediction-result.missed {
+  color: var(--warn);
+  background: rgba(250, 204, 21, 0.1);
+}
+
+.missions-xp-earned {
+  margin: 10px 0;
+  color: var(--warn);
+  font-weight: 800;
+  font-size: 18px;
+  animation: missions-pop 0.55s var(--ease);
+}
+
+.missions-badge-unlock {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 1px 10px;
+  align-items: center;
+  padding: 9px;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.missions-badge-unlock span {
+  grid-row: span 2;
+  font-size: 28px;
+  text-align: center;
+}
+
+.missions-badge-unlock b {
+  font-size: 13px;
+}
+
+.missions-badge-unlock em {
+  color: var(--muted);
+  font-style: normal;
+  font-size: 12px;
+}
+
+/* keep the outcome buttons reachable while the tall outcome card scrolls */
+.missions-outcome-actions {
+  position: sticky;
+  bottom: -14px;
+  margin: 12px -14px -14px;
+  padding: 10px 14px 14px;
+  background: rgba(18, 23, 31, 0.98);
+  border-top: 1px solid var(--border);
+  /* hints that the outcome continues underneath when the card scrolls */
+  box-shadow: 0 -12px 16px -8px rgba(0, 0, 0, 0.55);
+}
+
+.missions-hub {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(5, 7, 11, 0.54);
+  pointer-events: auto;
+}
+
+.missions-hub[hidden] {
+  display: none;
+}
+
+.missions-hub-panel {
+  position: relative;
+  width: min(760px, calc(100vw - 36px));
+  max-height: min(720px, calc(100vh - 36px));
+  overflow: auto;
+  padding: 18px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-lg);
+}
+
+.missions-hub-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.missions-hub-head {
+  padding-right: 38px;
+}
+
+.missions-hub h2 {
+  font-size: 22px;
+}
+
+.missions-hub p {
+  margin: 6px 0 0;
+  max-width: 54ch;
+}
+
+.missions-level {
+  flex: 0 0 150px;
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: right;
+}
+
+.missions-level b {
+  color: var(--warn);
+  font-size: 16px;
+}
+
+.missions-level div {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.missions-level i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand), var(--warn));
+}
+
+.missions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.missions-hub-item {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.missions-hub-item.locked {
+  opacity: 0.58;
+}
+
+.missions-hub-item.done {
+  border-color: rgba(74, 222, 128, 0.38);
+}
+
+.missions-hub-badge {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 22px;
+}
+
+.missions-hub-text {
+  min-width: 0;
+}
+
+.missions-hub-text h3 {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.missions-hub-text p {
+  margin: 3px 0;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+
+.missions-hub-text span {
+  color: var(--muted-dim);
+  font-size: 11px;
+}
+
+.missions-hub-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+@keyframes missions-pop {
+  0% { transform: translateY(6px) scale(0.96); opacity: 0; }
+  100% { transform: none; opacity: 1; }
+}
+
+@media (max-width: 760px) {
+  .missions-card {
+    width: min(340px, calc(100% - 24px));
+    left: 12px;
+    bottom: 12px;
+  }
+
+  .missions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .missions-hub-head {
+    flex-direction: column;
+  }
+
+  .missions-level {
+    width: 100%;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .missions-xp-earned {
+    animation: none;
+  }
+
+  .missions-spotlight {
+    transition: none;
+  }
+}
+
+/* short viewports: compact the outcome so the badge row isn't hidden under the sticky actions */
+@media (max-height: 820px) {
+  .missions-outcome h3 { margin-bottom: 6px; }
+  .missions-outcome .missions-why { margin: 6px 0; font-size: 12.5px; line-height: 1.45; }
+  .missions-outcome .missions-facts { margin: 8px 0; }
+  .missions-outcome .missions-xp-earned { margin: 6px 0; font-size: 16px; }
+  .missions-outcome .missions-badge-unlock { padding: 6px 8px; grid-template-columns: 34px 1fr; }
+  .missions-outcome .missions-badge-unlock span { font-size: 22px; }
+}

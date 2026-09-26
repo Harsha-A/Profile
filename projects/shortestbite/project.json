@@ -1,0 +1,14 @@
+{
+  "name": "ShortestBite",
+  "description": "Explore BFS, Dijkstra and A* as delivery riders navigate a procedural city or real Koramangala streets, with traffic, closures, rerouting, guided missions and a Knowledge section.",
+  "icon": "🍔",
+  "tags": [
+    "JavaScript",
+    "Canvas",
+    "Leaflet",
+    "OpenStreetMap",
+    "Algorithms"
+  ],
+  "demoUrl": "https://harsha-a.github.io/Profile/projects/shortestbite/",
+  "sourceUrl": "https://github.com/Harsha-A/Profile/tree/main/projects/shortestbite"
+}

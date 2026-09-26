@@ -1,0 +1,141 @@
+:root {
+  color-scheme: dark;
+  --bg: #0b0e12;
+  --surface: #12171f;
+  --surface-2: #1a212c;
+  --surface-3: #222b38;
+  --text: #e6edf3;
+  --muted: #8b96a5;
+  --muted-dim: #6b7685;
+  --brand: #e34d3a; /* warm tomato red */
+  --brand-soft: rgba(227, 77, 58, 0.16);
+  --accent: #38bdf8;
+  --good: #4ade80;
+  --warn: #facc15;
+  --bad: #f87171;
+  --border: #253040;
+  --border-strong: #35435a;
+  --radius: 10px;
+  --radius-sm: 7px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --shadow-lg: 0 12px 34px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 0.16s var(--ease), border-color 0.16s var(--ease), transform 0.16s var(--ease);
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  background: var(--surface-3);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+button.active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: white;
+}
+
+button.primary {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  font-weight: 600;
+}
+
+button.primary:hover:not(:disabled) {
+  background: #f05a46;
+  border-color: #f05a46;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+input[type='number'],
+input[type='text'],
+select {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 5px 8px;
+}
+
+input[type='range'] {
+  accent-color: var(--brand);
+}
+
+input[type='checkbox'] {
+  accent-color: var(--brand);
+}
+
+.clock,
+.stats dd,
+.hud-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
