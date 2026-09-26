@@ -515,6 +515,20 @@ h1, h2, h3 {
   padding: 6px 14px;
   border-radius: 999px;
 }
+.link-active {
+  font-size: 0.8rem;
+  color: var(--accent-cyan, #12b3d6);
+  border: 1px solid var(--accent-cyan, #12b3d6);
+  padding: 6px 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.link-active:hover,
+.link-active:focus-visible {
+  background-color: var(--accent-cyan, #12b3d6);
+  color: #05060f;
+}
 
 /* ---------- Footer ---------- */
 .footer {

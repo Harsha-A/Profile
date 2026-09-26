@@ -372,6 +372,63 @@
     return entries;
   }
 
+  /* ---------------- Launchpad manifest (project.json) ----------------
+     When an uploaded archive includes a project.json at its root, its
+     contents are upserted into projects.json so the Launchpad renders a
+     real project card instead of a static placeholder. */
+
+  /** Find the project.json among the already-planned commit files. */
+  function findManifestFile(files, targetFolder) {
+    const target = targetFolder ? targetFolder.replace(/\/+$/, "") : "";
+    return (
+      files.find((file) => {
+        const rel = target ? file.path.slice(target.length + 1) : file.path;
+        return rel === "project.json";
+      }) || null
+    );
+  }
+
+  function decodeUtf8(bytes) {
+    if (typeof TextDecoder !== "undefined") return new TextDecoder("utf-8").decode(bytes);
+    return Buffer.from(bytes).toString("utf8");
+  }
+
+  function encodeUtf8(str) {
+    if (typeof TextEncoder !== "undefined") return new TextEncoder().encode(str);
+    return new Uint8Array(Buffer.from(str, "utf8"));
+  }
+
+  /** Parse and validate a project.json's bytes into a Launchpad card record. */
+  function parseProjectManifest(bytes) {
+    let data;
+    try {
+      data = JSON.parse(decodeUtf8(bytes));
+    } catch (_) {
+      throw new Error("project.json is not valid JSON.");
+    }
+    if (!data || typeof data.name !== "string" || !data.name.trim()) {
+      throw new Error('project.json is missing a required "name" field.');
+    }
+    return {
+      name: String(data.name).trim(),
+      description: typeof data.description === "string" ? data.description.trim() : "",
+      icon: typeof data.icon === "string" && data.icon.trim() ? data.icon.trim() : "🛰️",
+      tags: Array.isArray(data.tags) ? data.tags.filter((t) => typeof t === "string").slice(0, 8) : [],
+      demoUrl: typeof data.demoUrl === "string" ? data.demoUrl.trim() : "",
+      sourceUrl: typeof data.sourceUrl === "string" ? data.sourceUrl.trim() : "",
+    };
+  }
+
+  /** Insert or replace a project entry (matched by id) in the manifest list. */
+  function upsertProjectEntry(existing, id, entry) {
+    const list = Array.isArray(existing) ? existing.slice() : [];
+    const record = Object.assign({ id: id }, entry);
+    const idx = list.findIndex((p) => p && p.id === id);
+    if (idx >= 0) list[idx] = record;
+    else list.push(record);
+    return list;
+  }
+
   return {
     slugify: slugify,
     isIgnoredPath: isIgnoredPath,
@@ -388,6 +445,10 @@
     commitFiles: commitFiles,
     verifyAccess: verifyAccess,
     readZip: readZip,
+    findManifestFile: findManifestFile,
+    parseProjectManifest: parseProjectManifest,
+    upsertProjectEntry: upsertProjectEntry,
+    encodeUtf8: encodeUtf8,
     MAX_BLOB_BYTES: MAX_BLOB_BYTES,
   };
 });

@@ -401,6 +401,49 @@
     return plan;
   }
 
+  /** Read the repo's current projects.json (public raw fetch; empty on any failure). */
+  async function fetchExistingProjects(owner, repo, branch) {
+    try {
+      const url =
+        "https://raw.githubusercontent.com/" + owner + "/" + repo + "/" + branch +
+        "/projects.json?t=" + Date.now();
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /**
+   * If the archive included a project.json at its root, upsert it into
+   * projects.json and add that file to the commit plan so the Launchpad
+   * picks up the new/updated card in the same atomic commit.
+   */
+  async function maybeUpdateLaunchpad(plan, form, branch) {
+    if (form.mode !== "extract") return;
+    const manifestFile = U.findManifestFile(plan.files, form.folder || "");
+    if (!manifestFile) return;
+
+    let manifest;
+    try {
+      manifest = U.parseProjectManifest(manifestFile.bytes);
+    } catch (error) {
+      log("project.json found but ignored — " + error.message, "warn");
+      return;
+    }
+
+    const id = U.slugify((form.folder || "").split("/").filter(Boolean).pop() || manifest.name);
+    log('Detected project.json — updating the Launchpad entry "' + manifest.name + '".');
+
+    const existing = await fetchExistingProjects(form.owner, form.repo, branch);
+    const merged = U.upsertProjectEntry(existing, id, manifest);
+    const bytes = U.encodeUtf8(JSON.stringify(merged, null, 2) + "\n");
+    plan.files.push({ path: "projects.json", bytes: bytes, size: bytes.length });
+    log('🛰️ Launchpad updated — "' + manifest.name + '" is now listed');
+  }
+
   el.upload.addEventListener("click", async () => {
     const form = readForm();
     const problem = validate(form, true);
@@ -417,15 +460,16 @@
     setStatus("Working…", "busy");
 
     try {
+      const branch = await resolveBranch(form);
       const plan = await buildFileList(form);
       if (!plan.files.length) {
         throw new Error("Nothing to commit — every entry in the archive was skipped.");
       }
 
+      await maybeUpdateLaunchpad(plan, form, branch);
+
       const total = plan.files.reduce((sum, file) => sum + (file.size || file.bytes.length), 0);
       log("Committing " + plan.files.length + " file(s), " + U.formatBytes(total) + " total.");
-
-      const branch = await resolveBranch(form);
 
       const result = await U.commitFiles({
         owner: form.owner,
