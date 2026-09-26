@@ -1,0 +1,8 @@
+{
+  "name": "Code Judge",
+  "description": "A browser-only LeetCode-style coding judge: 245 problems, JavaScript and TypeScript judged in a Web Worker, NeetCode 250 catalog, streaks and progress, all stored locally with optional GitHub sync.",
+  "icon": "⚖️",
+  "tags": ["JavaScript", "Vite", "Web Worker", "IndexedDB", "PWA"],
+  "demoUrl": "https://harsha-a.github.io/Profile/projects/code-judge/",
+  "sourceUrl": "https://github.com/Harsha-A/Profile/tree/main/projects/code-judge"
+}
