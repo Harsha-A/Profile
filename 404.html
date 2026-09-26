@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>404 — Lost in space</title>
+<meta name="robots" content="noindex" />
+<meta name="theme-color" content="#05060f" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Playfair+Display:wght@700;800&display=swap" />
+<!--
+  Everything here is inlined on purpose. GitHub Pages serves this file for ANY
+  missing path, and relative URLs would resolve against that path — so
+  "styles.css" would 404 too on a URL like /repo/a/b/c.
+-->
+<style>
+  :root {
+    --bg: #05060f;
+    --text-primary: #eef1f7;
+    --text-muted: #9aa3b8;
+    --accent-orange: #ff6a3d;
+    --accent-cyan: #12b3d6;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: #eef1f7;
+    font-family: "Space Grotesk", system-ui, -apple-system, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    overflow: hidden;
+  }
+  #stars { position: fixed; inset: 0; z-index: 0; }
+  .wrap { position: relative; z-index: 1; max-width: 34rem; }
+  .code {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(5rem, 22vw, 11rem);
+    line-height: 1;
+    margin: 0;
+    background: linear-gradient(100deg, #fff 10%, var(--accent-cyan) 55%, #8a6dff 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  h1 { font-size: clamp(1.25rem, 4vw, 1.75rem); margin: 0.5rem 0 0.75rem; }
+  p { color: var(--text-muted); line-height: 1.6; margin: 0 0 2rem; }
+  .home {
+    display: inline-block;
+    padding: 0.85rem 1.75rem;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #1a0f0a;
+    background: linear-gradient(120deg, var(--accent-orange), #ff9b5c);
+    box-shadow: 0 0 28px rgba(255, 106, 61, 0.45);
+    transition: transform 0.2s ease;
+  }
+  .home:hover { transform: translateY(-2px); }
+  .rocket { font-size: 3rem; display: block; margin-bottom: 1rem; animation: drift 4s ease-in-out infinite; }
+  @keyframes drift { 0%, 100% { transform: translateY(0) rotate(-8deg); } 50% { transform: translateY(-14px) rotate(4deg); } }
+  @media (prefers-reduced-motion: reduce) { .rocket { animation: none; } }
+</style>
+</head>
+<body>
+<canvas id="stars" aria-hidden="true"></canvas>
+
+<div class="wrap">
+  <span class="rocket" aria-hidden="true">🚀</span>
+  <p class="code">404</p>
+  <h1>Lost in space</h1>
+  <p>This page drifted out of orbit. Let's get you back to mission control.</p>
+  <a class="home" id="home-link" href="/">← Back to home base</a>
+</div>
+
+<script>
+  // The site root differs between a user site (example.github.io/) and a
+  // project site (example.github.io/repo/). A URL alone can't distinguish
+  // "/repo/missing" from "/missing-page", so guessing gets it wrong — instead
+  // probe whether the first path segment is a real directory and correct the
+  // link once we know.
+  (function () {
+    var link = document.getElementById("home-link");
+    var first = location.pathname.split("/").filter(Boolean)[0];
+
+    // A first segment containing a dot is a file, not a repository folder.
+    if (!first || first.indexOf(".") !== -1) {
+      link.setAttribute("href", "/");
+      return;
+    }
+
+    var candidate = "/" + first + "/";
+    link.setAttribute("href", candidate);
+
+    if (!window.fetch) return;
+    fetch(candidate, { method: "HEAD" })
+      .then(function (res) {
+        // 404 means the segment isn't a project folder, so root is the site root.
+        link.setAttribute("href", res.ok ? candidate : "/");
+      })
+      .catch(function () {
+        link.setAttribute("href", "/");
+      });
+  })();
+
+  // Lightweight starfield, matching the main page's backdrop.
+  (function () {
+    var canvas = document.getElementById("stars");
+    var ctx = canvas.getContext("2d");
+    var stars = [];
+    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      var count = Math.min(160, Math.round((canvas.width * canvas.height) / 9000));
+      stars = [];
+      for (var i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 1.3 + 0.2,
+          a: Math.random() * 0.6 + 0.2,
+          d: Math.random() * 0.02 + 0.004
+        });
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (var i = 0; i < stars.length; i++) {
+        var s = stars[i];
+        if (!reduced) {
+          s.a += s.d;
+          if (s.a > 0.85 || s.a < 0.15) s.d = -s.d;
+        }
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255," + s.a + ")";
+        ctx.fill();
+      }
+      if (!reduced) requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", resize);
+    resize();
+    draw();
+  })();
+</script>
+</body>
+</html>

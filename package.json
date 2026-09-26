@@ -1,0 +1,11 @@
+{
+  "name": "harsha-profile-page",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Space-themed personal profile page with a browser-based GitHub zip uploader.",
+  "scripts": {
+    "test": "node tests/uploader.test.js",
+    "serve": "python3 -m http.server 8000"
+  },
+  "license": "MIT"
+}
