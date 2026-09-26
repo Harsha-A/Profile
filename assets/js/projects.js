@@ -28,6 +28,33 @@
   function renderCards(projects) {
     grid.textContent = "";
     projects.forEach((project) => grid.appendChild(buildCard(project)));
+    observeReveal(grid.querySelectorAll(".reveal"));
+  }
+
+  /**
+   * script.js's own scroll-reveal observer only ever sees the elements that
+   * existed at page load, so cards inserted here after that async fetch
+   * resolves would stay permanently invisible (opacity: 0). Mirror the same
+   * reveal behavior for the elements we add.
+   */
+  function observeReveal(elements) {
+    if (!elements.length) return;
+    if (!("IntersectionObserver" in window)) {
+      elements.forEach((el) => el.classList.add("in-view"));
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in-view");
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    elements.forEach((el) => observer.observe(el));
   }
 
   function buildCard(project) {
