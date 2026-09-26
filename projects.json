@@ -4,8 +4,30 @@
     "name": "ShortestBite",
     "description": "Explore BFS, Dijkstra and A* as delivery riders navigate a procedural city or real Koramangala streets, with traffic, closures, rerouting, guided missions and a Knowledge section.",
     "icon": "🍔",
-    "tags": ["JavaScript", "Canvas", "Leaflet", "OpenStreetMap", "Algorithms"],
+    "tags": [
+      "JavaScript",
+      "Canvas",
+      "Leaflet",
+      "OpenStreetMap",
+      "Algorithms"
+    ],
     "demoUrl": "https://harsha-a.github.io/Profile/projects/shortestbite/",
     "sourceUrl": "https://github.com/Harsha-A/Profile/tree/main/projects/shortestbite"
+  },
+  {
+    "id": "nimbuslab",
+    "name": "NimbusLab",
+    "description": "A gamified cloud simulator that shows how resources really work: play through S3, GCS and Azure Blob multipart uploads with animated packets, part lanes, retries, guided missions and provider-by-provider comparisons.",
+    "icon": "☁️",
+    "tags": [
+      "React",
+      "TypeScript",
+      "AWS",
+      "GCP",
+      "Azure",
+      "Simulation"
+    ],
+    "demoUrl": "https://harsha-a.github.io/Profile/projects/nimbuslab/",
+    "sourceUrl": "https://github.com/Harsha-A/Profile/tree/main/projects/nimbuslab"
   }
 ]
